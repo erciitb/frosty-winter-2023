@@ -30,6 +30,6 @@ The final week has come, for you to show all that you have mastered. Not just th
 
 <img src="Task 2_files/final_maze.jpg" width=600 height=400>
 
-Head on to [Episode 0](https://github.com/erciitb/frosty-winter-2021/blob/main/Episode%200%20-%20A%20Study%20in%20ROSe.md) and start the investigation! 
+Head on to [Episode 0](https://github.com/erciitb/frosty-winter-2022/blob/main/Episode%200%20-%20A%20Study%20in%20ROSe.md) and start the investigation! 
 
 Let's begin !!
