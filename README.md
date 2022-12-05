@@ -24,7 +24,7 @@ This week is the one with introduction to most of the new stuff. You get to simu
 ### Week 2
 Time to put your sherlock brains to the test. I am sure all of you have used QR codes. Its time for SherlockBot to use them too. This week you are going to teach your bots how to _see_. Not just that, you can now process this data with the help of OpenCV. This is a library used to implement image processing. Simpler QR codes called ArUcos markers will be interfaced in your ROS setups. And get excited for the assignment of this week, so for it is the coolest of all. You have to solve a maze with certain penetrable walls by reading the ArUcos markers available. Now this is giving reallll Sherlock vibes!!
 
-<img src="W2_Images/cv_bridge_1.png" width=500 height=250><img src="W2_Images/maze.png" width=500 height=250>
+<img src="W2_Images/cv_bridge_1.jpg" width=500 height=250><img src="W2_Images/maze.jpg" width=500 height=250>
 ### Week 3
 The final week has come, for you to show all that you have mastered. Not just this, you also learn to write high quality code files to make your creations more of a universal standard. The assignment for this week is where you make a bot autonomous so that it can solve a much more complex maze. The story ends here and Sherlock awaits his next adventure.
 
