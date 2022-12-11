@@ -645,13 +645,14 @@ Have fun!
 ## Submission details
 
 ### Tentative deadline
-23 December 2021, 11:59 PM
+19 December 2022, 11:59 PM
 
 ### Mode of Submission
 
 The submission link is attached below.  Add ```bot_avoidance.py``` to a Google Drive folder and submit the link to the folder through the form. 
+<!--
 
-[Submission Link](https://forms.gle/V8uFe4nnEHsCqm9T9)
+[Submission Link](https://forms.gle/V8uFe4nnEHsCqm9T9)-->
 
 Access the form below using your respective IITB LDAP ID.
 
