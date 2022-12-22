@@ -137,7 +137,7 @@ Suppose, we are getting Image data on ```/camera/rgb/image_raw``` topic.
 Here is a node that listens to a ROS image message topic, converts the images into an cv::Mat, displays the image using OpenCV. 
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python3  #setting up environment
   
 import rospy
 from sensor_msgs.msg import Image
@@ -153,20 +153,24 @@ def callback(img_msg):
 
     # Try to convert the ROS Image message to a CV2 Image
     try:
-        cv_image = bridge.imgmsg_to_cv2(img_msg, "passthrough")
+        cv_image = bridge.imgmsg_to_cv2(img_msg, "passthrough")   # this function converts images format used
+								  # in ROS to the one used in CV
     except CvBridgeError as e:
         rospy.logerr("CvBridge Error: {0}".format(e))
 
     # Convert the image to Grayscale
-    gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)  # cv2.cvtColor(img_in , color code) converts the image 
+    						       # according to the color code. For example, 
+    						       # RGB to GBR to Grayscale etc. Refer this for more info. and codes
+						       # https://docs.opencv.org/4.x/d8/d01/group__imgproc__color__conversions.html
     # Show the converted image
-    cv2.namedWindow("Image Window", 1)
-    cv2.imshow("Image Window", gray)
-    cv2.waitKey(3)
+    cv2.namedWindow("Image Window", 1)    # creating a window in which the image will be displayed
+    cv2.imshow("Image Window", gray)      # displaying the new image in that window
+    cv2.waitKey(3)			  # wait 3 seconds for a user input
 
 
 def laser():
-    rospy.Subscriber('/camera/rgb/image_raw', Image, callback)
+    rospy.Subscriber('/camera/rgb/image_raw', Image, callback)  
     rospy.spin()
 
 
@@ -272,12 +276,15 @@ def detect_ArUco(img):
 	## 				{0: array([[315, 163], [319, 263], [219, 267], [215,167]], dtype=float32)}
 						
     Detected_ArUco_markers = {}
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    aruco_dict = aruco.Dictionary_get(aruco.DICT_5X5_250)
-    parameters = aruco.DetectorParameters_create()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)    		# converting image to grayscale
+    aruco_dict = aruco.Dictionary_get(aruco.DICT_5X5_250)	# extracting a pre-defined dictionary of various aruco markers
+    parameters = aruco.DetectorParameters_create()		# returns the parameters required by opencv to detect aruco markers. Leave it at default
+    
+    # get the coordinates of all the aruco markers in the scene along with their ID
     corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters = parameters) 
     i = 0
     
+    # storing extracted data
     try:
         for id in ids:
             for id_Number in id:
@@ -296,11 +303,12 @@ def mark_ArUco(img,Detected_ArUco_markers):
 	##			  Detected_ArUco_markers is the dictionary returned by function detect_ArUco(img)
 	## return: image helping sherlock to solve maze 
 
-    ids = Detected_ArUco_markers.keys()
+    ids = Detected_ArUco_markers.keys()   # IDs of all aruco markers in the scene
     print(Detected_ArUco_markers)
     centre_aruco = {}
     top_centre = {}
-
+	
+    # drawing circles and line for each aruco marker by using coordinates found earlier
     try:
         for id in ids:
             corners = Detected_ArUco_markers[id]
@@ -319,14 +327,14 @@ def mark_ArUco(img,Detected_ArUco_markers):
 def callback(img):
     bridge = CvBridge()
     try:
-        cv_image = bridge.imgmsg_to_cv2(img, "bgr8")
+        cv_image = bridge.imgmsg_to_cv2(img, "bgr8")       # convering imahe to CV2 usable format
     except CvBridgeError as e:
-        rospy.logerr("CvBridge Error: {0}".format(e))
-    Detected_ArUco_markers = detect_ArUco(cv_image)	  
-    img = mark_ArUco(cv_image,Detected_ArUco_markers)    
-    cv2.namedWindow("Image Window", 1)
-    cv2.imshow("Image Window", img)
-    k = cv2.waitKey(1)
+        rospy.logerr("CvBridge Error: {0}".format(e))      
+    Detected_ArUco_markers = detect_ArUco(cv_image)	   # Dictionary of detected markers
+    img = mark_ArUco(cv_image,Detected_ArUco_markers)      # Image marked with circles and line for each aruco marker
+    cv2.namedWindow("Image Window", 1)       		   # creating named window
+    cv2.imshow("Image Window", img)			   # displaying edited image
+    k = cv2.waitKey(1)					   # waiting 1 second for user input
     
 
 def laser():
