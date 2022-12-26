@@ -45,11 +45,11 @@ If it shwos 'ImportError: No module named pip' or similar error, you need to ins
  ```bash
  pip install pip
  ```
-Execute
+Execute either
 ```bash
 pip install opencv-contrib-python
+#or
 pip install opencv-python
-sudo apt-get install python-opencv
 ```
 Use ```pip2``` or ```pip3``` in the above commands, if python3 is configured with one of them.
 
