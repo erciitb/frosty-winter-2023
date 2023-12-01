@@ -1,4 +1,4 @@
-# Episode 0 - A Study in ROSe
+# Episode 0 - A Study in ROS2
 
 ## Introduction
 
