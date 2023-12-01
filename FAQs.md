@@ -16,9 +16,7 @@ If you are planning to use Ubuntu furthur, dedicate **full D ( E or F )** drive 
 
 <br/>
 
-**2.**  I am getting the following error message after running ```sudo apt install ros-noetic-desktop-full```. What to do ?
-
-<img src="W0_Images/apt_get_update.jpeg" width=700 height=300>
+**2.**  I am getting error message after running ```sudo apt install ros-humble-desktop-full```. What to do ?
 
 **Ans:**  Run ```sudo apt-get update``` and WAIT ! It takes time for this step to completely finish and it might seem like nothing is happening. Be patient.
 
@@ -30,22 +28,3 @@ If you are planning to use Ubuntu furthur, dedicate **full D ( E or F )** drive 
 
 **Ans:** Refer to the methods in this [link](https://askubuntu.com/questions/178909/not-enough-space-in-var-cache-apt-archives) and hopefully the issue should be resolved.
 
-**4.** I am getting the following error message after running ```sudo apt install ros-noetic-desktop-full```. What to do ?
-
-<img src="W0_Images/Broken_package.jpeg" width=700 height=250>
-
-**Ans:** TBD
-
-**5.** I got like 'no valid openPGP data found'
-
-<img src="W0_Images/pgp.jpeg" width=640 height=360>
-
-**Ans:** run ```sudo apt-get install ca-certificates```
-
-If that also doesn't work,try either
-
-```
-sudo apt-key del 421C365BD9FF1F717815A3895523BAEEB01FA116
-#or
-sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-```
