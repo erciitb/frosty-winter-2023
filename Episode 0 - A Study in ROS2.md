@@ -527,17 +527,20 @@ Note that once you stop running the Publisher Node ( Press `Ctrl`+`C` while you'
 
 Create a new directory in your package to store your launch files
 ```bash
+cd src
 mkdir launch
 ```
-Create a file ```pubsub.py``` in the ```launch``` folder of ```erc_ws``` 
+Create a file ```pubsub.py``` in the ```launch``` folder of ```erc_ws/src``` 
 
 ```bash
+cd launch
 touch pubsub.py
+code .
 ```
 
 Add the following code.
 
-```bash
+```python
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
@@ -545,18 +548,27 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='pubsub',
-            executable='talker.py',
-            name='publisher'
+            executable='publisher',
         ),
         Node(
             package='pubsub',
-            executable='listener.py',
-            name='subscriber'
+            executable='subscriber',
         ),
     ])
 ```
 
-```name``` refers to the name of the node, ```package``` refers to the name of the package in which the node is present in, ```executable``` is the name of the node file
+```package``` refers to the name of the package in which the node is present in, ```executable``` is the name of the node file
+
+```bash
+cd ..
+code .
+```
+Now add the following line in ```setup.py``` in the ```data_files```
+
+
+```python
+(os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', 'pubsub.launch.py'))),
+```
 
 On executing ```ros2 launch pubsub.py```, you will be able to see **Publisher** and **Subscriber** in the list of Nodes. 
 
