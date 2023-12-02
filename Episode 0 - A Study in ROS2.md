@@ -530,11 +530,11 @@ Create a new directory in your package to store your launch files
 cd src
 mkdir launch
 ```
-Create a file ```pubsub.py``` in the ```launch``` folder of ```erc_ws/src``` 
+Create a file ```pubsub.launch.py``` in the ```launch``` folder of ```erc_ws/src``` 
 
 ```bash
 cd launch
-touch pubsub.py
+touch pubsub.launch.py
 code .
 ```
 
@@ -570,7 +570,7 @@ Now add the following line in ```setup.py``` in the ```data_files```
 (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', 'pubsub.launch.py'))),
 ```
 
-On executing ```ros2 launch pubsub.py```, you will be able to see **Publisher** and **Subscriber** in the list of Nodes. 
+On executing ```ros2 launch pubsub pubsub.launch.py```, you will be able to see **Publisher** and **Subscriber** in the list of Nodes. 
 
 While the system is still running, open a new terminal and run ```rqt_graph``` to get a better idea of the relationship between the nodes in your launch file.
 
