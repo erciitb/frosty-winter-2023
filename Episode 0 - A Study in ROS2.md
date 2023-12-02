@@ -50,6 +50,8 @@ For using ROS2 framework, Ubuntu is not necessary, it can work on Mac and Window
 
   **Microsoft  Store** : You can also directly download the Ubuntu from the store, you will get a terminal.
 
+    PS: For GUI app on WSL follow the [link](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps)
+
 	**The Construct website** : You are also free to use [**theconstructsim**](https://www.theconstructsim.com/) without having to install anything. The Construct is an online platform that supports ROS development.
 
 </ul>
@@ -157,10 +159,10 @@ Now, let’s add the erc_ws path. Execute the following command:
 
 ```bash
 cd ~		# go to the home folder
-nano .bashrc	# open the .bashrc file
+gedit .bashrc	# open the .bashrc file
 ```
 Add the command `source ~/erc_ws/install/setup.bash` to the end of *.bashrc*.  
-Then, hit <kbd>CTRL</kbd>+<kbd>X</kbd>, then, <kbd>Y</kbd>, to save the changes to the file.
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file, then close the window.
 
 When you make changes to your .bashrc file, run:
 ```bash
@@ -215,13 +217,19 @@ mkdir launch
 ```
 
 Let’s put together a ROS 2 launch file using the turtlesim package and its executables.
-Copy and paste the complete code into the ```launch/turtlesim_launch.py``` file:
 
 ```bash
+cd launch
 touch turtlesim_launch.py
 ```
-
+Open this directory with code using the following command
 ```bash
+code .
+```
+
+Copy and paste the complete code into the ```launch/turtlesim_launch.py``` file:
+
+```python
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
@@ -234,11 +242,11 @@ def generate_launch_description():
         )
     ])
 ```
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file, then close the window.
 
 To run the launch file created above, enter into the directory you created earlier and run the following command:
 
 ```bash
-cd launch
 ros2 launch turtlesim_launch.py
 ```
 
@@ -287,9 +295,10 @@ Creating a publisher or subscriber node is just like creating any other node. <b
 
 ### Create a executeable python file
 
-Navigate into ```erc_ws/src/pubsub/pubsub``` and then create a python file 
+Open a new terminal and navigate into ```erc_ws/src/pubsub/pubsub``` and then create a python file 
 
 ```bash
+cd erc_ws/src/pubsub/pubsub
 touch talker.py
 chmod +x talker.py #Making the python file executable
 ```
@@ -298,61 +307,78 @@ chmod +x talker.py #Making the python file executable
 
 This is a basic publisher node python script ```talker.py```  (taken from the official ROS tutorials from the website, and comments are added to help you understand the working of each line):
 
+To open VS code.
+```bash
+code .
+```
+Paste the following in the ```talker.py```
+
 ```python
 #!/usr/bin/env python
 import rclpy
 from std_msgs.msg import String
 
 def timer_callback(timer, i):
-    # Create a String message and set its data
+    # Create a String message
     msg = String()
     msg.data = 'Hello World: %d' % i
-    
-    # Publish the message
+
+    # Publish the message using the global publisher
     publisher.publish(msg)
-    
-    # Log the published message
-    get_logger().info('Publishing: "%s"' % msg.data)
+
+    # Print a message indicating what is being published
+    print('Publishing: "%s"' % msg.data)
 
 def main(args=None):
-    # Initialize the ROS2 client library
+    # Initialize the ROS 2 system
     rclpy.init(args=args)
 
-    # Create a ROS2 node
+    # Create a ROS 2 node named 'minimal_publisher'
     node = rclpy.create_node('minimal_publisher')
 
-    # Create a publisher for the 'topic' with String messages
+    # Create a global publisher for the 'topic' with a message type of String
     global publisher
     publisher = node.create_publisher(String, 'topic', 10)
 
-    # Get the logger for the node
-    global get_logger
-    get_logger = node.get_logger()
+    # Set the timer period to 0.5 seconds
+    timer_period = 0.5
 
-    # Set the timer period and initialize a counter
-    timer_period = 0.5  # seconds
+    # Initialize a counter variable
     i = 0
 
-    # Create a timer and associate it with the timer_callback function
-    timer = node.create_timer(timer_period, lambda timer: timer_callback(timer, i))
+    # Create a timer that calls the timer_callback function every timer_period seconds
+    timer = node.create_timer(timer_period, lambda: timer_callback(timer, i))
 
-    # Spin the node to handle callbacks
-    rclpy.spin(node)
+    # Increment the counter
+    i += 1
 
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
-    node.destroy_node()
+    try:
+        # Start spinning the ROS 2 node
+        rclpy.spin(node)
+    finally:
+        # Destroy the node explicitly when done spinning
+        # (optional - otherwise it will be done automatically
+        # when the garbage collector destroys the node object)
+        node.destroy_node()
 
-    # Shutdown the ROS2 client library
-    rclpy.shutdown()
+        # Shutdown the ROS 2 system
+        rclpy.shutdown()
 
-if _name_ == '_main_':
+# Entry point to the script
+if __name__ == '__main__':
+    # Call the main function if this script is the main module
     main()
 ```
 
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file.
+
 ## Add dependencies
 Navigate one level back to the ```erc_ws/src/pubsub``` directory, where the setup.py, setup.cfg, and package.xml files have been created for you.
+
+```bash
+cd ..
+code .
+```
 
 Open package.xml with your text editor. Add the following dependencies corresponding to your node’s import statements:
 
@@ -360,6 +386,7 @@ Open package.xml with your text editor. Add the following dependencies correspon
 <exec_depend>rclpy</exec_depend>
 <exec_depend>std_msgs</exec_depend>
 ```
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file.
 
 This declares the package needs rclpy and std_msgs when its code is executed.
 
@@ -375,6 +402,7 @@ entry_points={
         ],
 },
 ```
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file.
 
 
 ### Writing a simple Subscriber Node <a name="Subscriber"></a>
@@ -383,44 +411,63 @@ Make the listener.py file similarly as we have done for talker.py.
 
 This is a basic subscriber node python script ```listener.py``` (taken from the official ROS tutorials from the website, and comments are added to help you understand the working of each line):
 
+```bash
+cd ~
+cd erc_ws/src/pubsub/pubsub
+touch listener.py
+chmod +x listener.py
+```
+
+Paste the following in the ```listner.py```
+
 ```python
 #!/usr/bin/env python
-import rclpy
+iimport rclpy
 from std_msgs.msg import String
 
 def listener_callback(msg):
-    # Log the received message
-    get_logger().info('I heard: "%s"' % msg.data)
+    print('I heard: "%s"' % msg.data)
 
 def main(args=None):
-    # Initialize the ROS2 client library
+    # Initialize the ROS 2 system
     rclpy.init(args=args)
 
-    # Create a ROS2 node
+    # Create a ROS 2 node named 'minimal_subscriber'
     node = rclpy.create_node('minimal_subscriber')
 
-    # Create a subscription for the 'topic' with String messages
+    # Create a subscription to the 'topic' with a message type of String
     subscription = node.create_subscription(String, 'topic', listener_callback, 10)
 
-    # Get the logger for the node
-    get_logger = node.get_logger()
+    # Prevent unused variable warning
+    subscription
 
-    # Spin the node to handle callbacks
-    rclpy.spin(node)
+    try:
+        # Start spinning the ROS 2 node
+        rclpy.spin(node)
+    finally:
+        # Destroy the node explicitly when done spinning
+        # (optional - otherwise it will be done automatically
+        # when the garbage collector destroys the node object)
+        node.destroy_node()
 
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
-    node.destroy_node()
+        # Shutdown the ROS 2 system
+        rclpy.shutdown()
 
-    # Shutdown the ROS2 client library
-    rclpy.shutdown()
-
-if _name_ == '_main_':
+# Entry point to the script
+if __name__ == '__main__':
+    # Call the main function if this script is the main module
     main()
 ```
 
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file.
+
 Now similarly for subscriber add entry points as in publisher node.
+
+```bash
+cd ..
+code .
+```
+Now change the following in ```setup.py```
 
 ```bash
 entry_points={
@@ -430,10 +477,16 @@ entry_points={
         ],
 },
 ```
+Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file.
 
 ## Build and run
 
 You likely already have the ```rclpy``` and ```std_msgs``` packages installed as part of your ROS 2 system. It’s good practice to run rosdep in the root of your workspace (erc_ws) to check for missing dependencies before building:
+
+```bash
+cd ~
+cd erc_ws
+```
 
 ```bash
 rosdep install -i --from-path src --rosdistro humble -y
