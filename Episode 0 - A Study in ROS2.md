@@ -295,9 +295,10 @@ Creating a publisher or subscriber node is just like creating any other node. <b
 
 ### Create a executeable python file
 
-Open a new terminal and navigate into ```erc_ws/src/pubsub/pubsub``` and then create a python file 
+Navigate into ```erc_ws/src/pubsub/pubsub``` and then create a python file 
 
 ```bash
+cd ~
 cd erc_ws/src/pubsub/pubsub
 touch talker.py
 chmod +x talker.py #Making the python file executable
@@ -496,6 +497,12 @@ Finally, go to erc_ws and build the package
 
 ```python
 colcon build
+```
+
+Now source the setup files
+
+```bash
+source install/setup.bash
 ```
 
 Now run the publisher node:
