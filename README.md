@@ -20,6 +20,6 @@ Learn basic tools and units of ROS, how these interact with each other and how t
 
 .... to be continued
 
-Head on to [Episode 0](https://github.com/erciitb/frosty-winter-2023/blob/main/Episode%200%20-%20A%20Study%20in%20ROSe.md) and start the investigation! 
+Head on to [Episode 0](https://github.com/erciitb/frosty-winter-2023/blob/main/Episode%200%20-%20A%20Study%20in%20ROS2.md) and start the investigation! 
 
 Let's begin !!
