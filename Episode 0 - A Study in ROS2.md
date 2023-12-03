@@ -263,7 +263,7 @@ erc_ws
 
 Launch files in a particular package can launch nodes from other packages as well as launch files from other packages.
 
-```PS:``` In the turtlesim_launch we run the launch file from the same directory, if we want to run it from any dirctory using the genralized command, i.e.
+```PS:``` In the turtlesim_launch we run the launch file from the same directory, if we want to run it from any directory using the generalized command, i.e.
 ```bash
 ros2 launch <package name> <launch file name> 
 ```
