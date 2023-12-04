@@ -419,11 +419,11 @@ touch listener.py
 chmod +x listener.py
 ```
 
-Paste the following in the ```listner.py```
+Paste the following in the ```listener.py```
 
 ```python
 #!/usr/bin/env python
-iimport rclpy
+import rclpy
 from std_msgs.msg import String
 
 def listener_callback(msg):
