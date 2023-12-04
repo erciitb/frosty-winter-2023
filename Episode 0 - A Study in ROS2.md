@@ -110,7 +110,7 @@ The bullet points below a particular link will help you focus more on the import
 
 Sections to focus in "Configuring your ROS environment":
 
-- Sourcing of setup.bash file : "source /opt/ros/distro/setup.bash" 
+- Sourcing of setup.bash file : ```source /opt/ros/humble/setup.bash```
 The purpose of this command line is basically to tell your terminal the location of your workspace so that ROS can find its path. If we unsource the setup.bash files then the Ubuntu will not be able to locate the packages of that workspace.
 - Looking at the video below will help more.
 - Its an advise to not panic if you don't grasp things in one go, try to go completely by this twice or thrice for more clarity and try to connect dots while reading the second or third time.
@@ -158,11 +158,8 @@ colcon build
 Now, let’s add the erc_ws path. Execute the following command:
 
 ```bash
-cd ~		# go to the home folder
-gedit .bashrc	# open the .bashrc file
+echo "source ~/erc_ws/install/setup.bash" >> ~/.bashrc
 ```
-Add the command `source ~/erc_ws/install/setup.bash` to the end of *.bashrc*.  
-Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file, then close the window.
 
 When you make changes to your .bashrc file, run:
 ```bash
@@ -181,7 +178,7 @@ Recall that packages should be created in the src directory, not the root of the
 
 ```bash
 cd erc_ws/src
-ros2 pkg create --build-type ament_python pubsub
+ros2 pkg create --build-type ament_python week0_tutorials
 ```
 
 If you get an error setup.py install is deprecated on running colcon build then you need to downgrade the setuptools to 58.2.0
@@ -207,12 +204,13 @@ ros2 run turtlesim turtlesim_node
 ```
 You'll see the new turtlesim window.
 
-## Using roslaunch to run multiple nodes at once
+## Using ros2 launch to run multiple nodes at once
 
 ROS 2 Launch files allow you to start up and configure a number of executables containing ROS 2 nodes simultaneously.
 
-Create a new directory in erc_ws to store your launch files:
+Create a new directory in ```erc_ws/src/week0_tutorials``` to store your launch files:
 ```bash
+cd src/week0_tutorials
 mkdir launch
 ```
 
@@ -250,6 +248,26 @@ To run the launch file created above, enter into the directory you created earli
 ros2 launch turtlesim_launch.py
 ```
 
+File structure is something like this
+
+```bash
+erc_ws
+  |_ Install
+  |_src
+       |_week0_tutorials(pkg)
+               |_src
+               |_scripts
+               |_launch
+               |_config
+```
+
+Launch files in a particular package can launch nodes from other packages as well as launch files from other packages.
+
+```PS:``` In the turtlesim_launch we run the launch file from the same directory, if we want to run it from any directory using the generalized command, i.e.
+```bash
+ros2 launch <package name> <launch file name> 
+```
+ then we have to specify the path in setup.py and then go to workspace directory and then colcon build, and run this. Here we exceuted the run file directly from the directory, though we will do this later in the end of the tutorial in the ```pubsub.launch.py``` case.
 
 
 ### Topics
@@ -288,18 +306,20 @@ Creating a publisher or subscriber node is just like creating any other node. <b
 
 1. Go to the package where you want to create these nodes 
 
-2. Make a new directory or folder 
+2. Make a new directory ```scripts```
  
 3. Create python script files for a publisher and a subscriber
 
 
 ### Create a executeable python file
 
-Navigate into ```erc_ws/src/pubsub/pubsub``` and then create a python file 
+Navigate into ```erc_ws/src/week0_tutorials/scripts``` and then create a python file 
 
 ```bash
 cd ~
-cd erc_ws/src/pubsub/pubsub
+cd erc_ws/src/week0_tutorials
+mkdir scripts
+cd scripts
 touch talker.py
 chmod +x talker.py #Making the python file executable
 ```
@@ -374,7 +394,7 @@ if __name__ == '__main__':
 Then, hit <kbd>CTRL</kbd>+<kbd>S</kbd>, to save the changes to the file.
 
 ## Add dependencies
-Navigate one level back to the ```erc_ws/src/pubsub``` directory, where the setup.py, setup.cfg, and package.xml files have been created for you.
+Navigate one level back to the ```erc_ws/src/week0_tutorials``` directory, where the setup.py, setup.cfg, and package.xml files have been created for you.
 
 ```bash
 cd ..
@@ -399,7 +419,7 @@ Open the setup.py file, and add the following line within the console_scripts br
 ```bash
 entry_points={
         'console_scripts': [
-                'publisher = pubsub.talker:main',
+                'publisher = week0_tutorials.talker:main',
         ],
 },
 ```
@@ -414,7 +434,7 @@ This is a basic subscriber node python script ```listener.py``` (taken from the 
 
 ```bash
 cd ~
-cd erc_ws/src/pubsub/pubsub
+cd erc_ws/src/week0_tutorials/scripts
 touch listener.py
 chmod +x listener.py
 ```
@@ -473,8 +493,8 @@ Now change the following in ```setup.py```
 ```bash
 entry_points={
         'console_scripts': [
-                'publisher = pubsub.talker:main',
-                'subscriber = pubsub.listener:main',
+                'publisher = week0_tutorials.talker:main',
+                'subscriber = week0_tutorials.listener:main',
         ],
 },
 ```
@@ -495,7 +515,7 @@ rosdep install -i --from-path src --rosdistro humble -y
 	
 Finally, go to erc_ws and build the package
 
-```python
+```bash
 colcon build
 ```
 
@@ -508,13 +528,13 @@ source install/setup.bash
 Now run the publisher node:
 
 ```bash
-ros2 run pubsub publisher
+ros2 run week0_tutorials publisher
 ```
 
 Similarly run the subscriber node in a new terminal. Remember to source the workspace if you haven't already.
 
 ```bash
-ros2 run pubsub subscriber
+ros2 run week0_tutorials subscriber
 ```
 
 You can see that 'Hello World: n' is being printed. The Publisher Node is up and running!
@@ -525,12 +545,7 @@ Note that once you stop running the Publisher Node ( Press `Ctrl`+`C` while you'
 
 ### Running the publisher and subscriber using a launch file
 
-Create a new directory in your package to store your launch files
-```bash
-cd src
-mkdir launch
-```
-Create a file ```pubsub.launch.py``` in the ```launch``` folder of ```erc_ws/src``` 
+Create a file ```week0_tutorials.launch.py``` in the ```launch``` folder of ```erc_ws/src/week0_tutorials``` 
 
 ```bash
 cd launch
@@ -547,11 +562,11 @@ from launch_ros.actions import Node
 def generate_launch_description():
     return LaunchDescription([
         Node(
-            package='pubsub',
+            package='week0_tutorials',
             executable='publisher',
         ),
         Node(
-            package='pubsub',
+            package='week0_tutorials',
             executable='subscriber',
         ),
     ])
@@ -570,7 +585,7 @@ Now add the following line in ```setup.py``` in the ```data_files```
 (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', 'pubsub.launch.py'))),
 ```
 
-On executing ```ros2 launch pubsub pubsub.launch.py```, you will be able to see **Publisher** and **Subscriber** in the list of Nodes. 
+On executing ```ros2 launch week0_tutorials pubsub.launch.py```, you will be able to see **Publisher** and **Subscriber** in the list of Nodes. 
 
 While the system is still running, open a new terminal and run ```rqt_graph``` to get a better idea of the relationship between the nodes in your launch file.
 
