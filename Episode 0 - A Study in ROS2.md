@@ -313,13 +313,11 @@ Creating a publisher or subscriber node is just like creating any other node. <b
 
 ### Create a executeable python file
 
-Navigate into ```erc_ws/src/week0_tutorials/scripts``` and then create a python file 
+Navigate into ```erc_ws/src/week0_tutorials/week0_tutorials``` and then create a python file 
 
 ```bash
 cd ~
-cd erc_ws/src/week0_tutorials
-mkdir scripts
-cd scripts
+cd erc_ws/src/week0_tutorials/week0_tutorials
 touch talker.py
 chmod +x talker.py #Making the python file executable
 ```
@@ -342,7 +340,7 @@ from std_msgs.msg import String
 def timer_callback(timer, i):
     # Create a String message
     msg = String()
-    msg.data = 'Hello World: %d' % i
+    msg.data = 'Hello World'
 
     # Publish the message using the global publisher
     publisher.publish(msg)
@@ -434,7 +432,7 @@ This is a basic subscriber node python script ```listener.py``` (taken from the 
 
 ```bash
 cd ~
-cd erc_ws/src/week0_tutorials/scripts
+cd erc_ws/src/week0_tutorials/week0_tutorials
 touch listener.py
 chmod +x listener.py
 ```
@@ -509,10 +507,13 @@ cd ~
 cd erc_ws
 ```
 
+```(optional)```
+
 ```bash
 rosdep install -i --from-path src --rosdistro humble -y
 ```
-	
+
+
 Finally, go to erc_ws and build the package
 
 ```bash
@@ -583,6 +584,13 @@ Now add the following line in ```setup.py``` in the ```data_files```
 
 ```python
 (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', 'pubsub.launch.py'))),
+```
+
+and add the follwing on the top of ```setup.py```
+
+```python 
+import os
+from glob import glob
 ```
 
 On executing ```ros2 launch week0_tutorials pubsub.launch.py```, you will be able to see **Publisher** and **Subscriber** in the list of Nodes. 
