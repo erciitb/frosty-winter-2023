@@ -419,6 +419,24 @@ def generate_launch_description():
 
 On executing  ```ros2 launch week1_tutorials custom_rviz.launch```, Rviz will be launched with the desired configuration.
 
+## ros_gz 
+
+ros_gz is a collection of packages that integrate ROS and Gazebo, enabling seamless communication between the two platforms. It provides features like bidirectional data exchange, image transport, point cloud publishing, and convenient tools for easy setup and use. By simulating robots in a virtual environment, ros_gz accelerates development, enhances debugging, and expands the possibilities of ROS-based robotics.
+
+To install add https://packages.ros.org
+
+```bash
+ sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+ sudo apt-get update
+```
+
+Install ```ros_gz```
+
+```bash
+ sudo apt install ros-humble-ros-gz
+```
+
 ## mrs_hudson emerges ... <a name="mrs_hudson"></a>
 
 Meet mrs_hudson, our Sherlock-themed bot for hands-on ROS, Gazebo, and Rviz exploration. You'll find meticulously crafted URDF and launch files, enabling seamless integration for accomplishing investigations and unfolding mysteries
@@ -452,6 +470,8 @@ Do a replace all in both the URDF and SDF file.
 )
 
 Then run ```colcon build``` in the workspace.
+
+You can visit the [mrs_hudson repo](https://github.com/erciitb/mrs_hudson.git) on the ERC GitHub page.
 
 Henceforth, the **mrs_hudson** may be referred to as **bot** simply, unless specified.
 
