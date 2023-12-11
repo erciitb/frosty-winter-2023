@@ -1,0 +1,600 @@
+# Episode 1 - The Blind Bot
+
+## Introduction
+
+If you have gone through the content of Week 0 and tried the problem, you should be familiar with the basic ideas of ROS. In addition, you should be capable of creating a simple publisher and a subscriber. If so, you are ready to face what is about to come your way. In this episode, you will see how to work in **Gazebo** and **Rviz**. 
+
+
+<img src="W1_Images/Gazebo.jpg" width=320 height=150> <img src="W1_Images/Rviz.png" width=320 height=150>
+
+You will also get to play with the **Mrs_Hudson** in Gazebo and see the working of its sensors in Rviz2.
+
+<img src="W1_Images/mrs_hudson.jpeg" width=200 height=300>
+
+Let's begin !
+
+## Table of Contents
+
+<ol>
+  <li><a href="#Gazebo">Gaze at Gazebo ...</a></li>
+  <li><a href="#Rviz">Viziting Rviz ...</a></li>
+  <li><a href="#mrs_hudson">mrs_hudson emerges ...</a></li>
+</ol>
+
+## Initial preparation
+
+Create a package ```week1_tutorials``` in ```erc_ws```, with ```launch```, ```models```, ```worlds``` and ```configs``` folders. This will be required for storing the various files that will be created throughout. Recall how to make a package from week 0. 
+
+## Gaze at Gazebo ... <a name="Gazebo"></a>
+
+
+### What is it ?
+
+Gazebo is a **robotics simulator** that is capable of simulating **dynamical systems** in various **realistic scenarios and environments**. 
+This is useful for testing algorithms and designing robots before actually implementing in the real physical world.We will be using Gazebo Fortress.
+
+
+### Installing Gazebo
+
+First install some necessary tools:
+
+
+```bash
+sudo apt-get update
+sudo apt-get install lsb-release wget gnupg
+```
+Then install Ignition Fortress:
+
+```bash
+sudo wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+sudo apt-get update
+sudo apt-get install ignition-fortress
+```
+
+Launch Gazebo Sim, a 3D robotics simulator, from a terminal by running:
+
+```bash
+ign gazebo sim shapes.sdf
+```
+
+<img src="W1_Images/gazebo_interface.png" width=600 height=400>
+
+
+Welcome to Gazebo !
+
+### Basic features
+
+Refer to the following link to know about the basic GUI features of Gazebo.
+
+[Understanding the GUI](https://gazebosim.org/docs/harmonic/gui)
+
+### Manipulating Models : The Transform Control
+
+The top left toolbar contains controls for transforming. 
+
+1. Open Gazebo
+2. The View Angle plugin allows you to quickly and easily adjust the direction from which your scene faces an entity in the simulation.
+3. The Component Inspector plugin displays a variety of object attributes.
+
+4.  The Align Tool aligns entities along or about a specific entity's bounding box.
+
+5.  Select Mode: Click to select entities in the scene. It is the default mode. To select multiple entities, hold ```Ctrl``` and click. Entities can't be manipulated in select mode. 
+    You can always return to selection mode from any other mode by pressing Esc.
+
+    <img src="W1_Images/select.png" width=500 height=500>
+
+6.  Translate  Mode: Allows to translate entities along the x, y and z axes.(Shortcut ```T```)
+
+    <img src="W1_Images/translate_icon.png" width=500 height=100>
+
+
+    <img src="W1_Images/translate.gif" width=500 height=500>
+
+
+7.  Rotate  Mode: Allows to rotate entities around the roll, pitch and yaw axes of rotation.(Shortcut ```R```)
+
+    <img src="W1_Images/rotate_icon.png" width=500 height=100>
+
+    <img src="W1_Images/rotate.gif" width=500 height=500>
+
+
+
+### Keyboard Shortcuts
+
+
+<img src="W1_Images/key_shortcuts.png" width=700 height=350>
+
+
+#### Building your own Robot
+
+##### SDF
+SDFormat (Simulation Description Format), sometimes abbreviated as SDF, is an XML format that describes objects and environments for robot simulators, visualization, and control.
+
+We will start by building a simple world and then build our robot in it. Open a new file called cub_world.sdf and copy the following code to it.
+
+```bash
+<?xml version="1.0" ?>
+<sdf version="1.8">
+    <world name="cub_world">
+        <physics name="1ms" type="ignored">
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1.0</real_time_factor>
+        </physics>
+        <plugin
+            filename="libignition-gazebo-physics-system.so"
+            name="ignition::gazebo::systems::Physics">
+        </plugin>
+        <plugin
+            filename="libignition-gazebo-user-commands-system.so"
+            name="ignition::gazebo::systems::UserCommands">
+        </plugin>
+        <plugin
+            filename="libignition-gazebo-scene-broadcaster-system.so"
+            name="ignition::gazebo::systems::SceneBroadcaster">
+        </plugin>
+
+        <light type="directional" name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    </plane>
+                </geometry>
+                </collision>
+                <visual name="visual">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    <size>100 100</size>
+                    </plane>
+                </geometry>
+                <material>
+                    <ambient>0.8 0.8 0.8 1</ambient>
+                    <diffuse>0.8 0.8 0.8 1</diffuse>
+                    <specular>0.8 0.8 0.8 1</specular>
+                </material>
+                </visual>
+            </link>
+        </model>
+    </world>
+</sdf>
+```
+
+
+Save the file in the ```models``` directory of the package, navigate to the directory and launch the simulator:
+
+```ign gazebo cub_world.sdf```
+
+
+#### Building a cuboidal box
+
+Under the </model> tag we will add our robot model as follows:
+
+```bash
+<model name='cuboidal_model' canonical_link='cuboid'>
+    <pose relative_to='world'>0 0 0 0 0 0</pose>
+```
+
+Every model is a group of links (can be just one link) connected together with joints.
+
+```bash
+ <link name='cuboid'>
+        <pose relative_to='__model__'>0.5 0 0.4 0 0 0</pose>
+```
+Inertial properties
+
+```bash
+  <inertial> <!--inertial properties of the link mass, inertia matix-->
+        <mass>1.14395</mass>
+        <inertia>
+            <ixx>0.095329</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.381317</iyy>
+            <iyz>0</iyz>
+            <izz>0.476646</izz>
+        </inertia>
+    </inertial>
+```
+Visual
+
+```bash
+    <visual name='visual'>
+        <geometry>
+            <box>
+                <size>2.0 1.0 0.5</size>
+            </box>
+        </geometry>
+        <!--let's add color to our link-->
+        <material>
+            <ambient>0.0 0.0 1.0 1</ambient>
+            <diffuse>0.0 0.0 1.0 1</diffuse>
+            <specular>0.0 0.0 1.0 1</specular>
+        </material>
+    </visual>
+```
+
+Collision
+
+```bash
+        <collision name='collision'>
+            <geometry>
+                <box>
+                    <size>2.0 1.0 0.5</size>
+                </box>
+            </geometry>
+        </collision>
+    </link>
+</model>
+```
+
+After copying all the parts above into the world file in order, run the world again:
+
+```ign gazebo cub_world.sdf```
+
+
+#### Spawning models using launch file
+
+If you want to spawn the models when launching gazebo world. Make a launch file ```cub.launch.py``` in the launch folder in the package and add the following code
+
+```py
+from launch import LaunchDescription
+from launch_ros.actions import Node
+import os
+from launch.actions import DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from ament_index_python.packages import get_package_share_directory
+
+def generate_launch_description():
+	
+	pkg_project = get_package_share_directory('week1_tutorials')
+	sdf_file = os.path.join(pkg_project, 'models', 'cub_world.sdf')
+	with open(sdf_file, 'r') as infp:
+ 		robot_desc = infp.read()
+	
+	gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
+        launch_arguments={'gz_args': '-r sdf_file'}.items(),
+    	)
+
+	return LaunchDescription([
+		gz_sim,
+		])
+
+```
+
+Now execute ```ros2 launch week1_tutorials cub.launch.py``` to launch world and spawn the model into it.
+  
+### Plugins
+  
+Plugins are a dynamically loaded chunk of code. For example:
+
+```bash
+<plugin
+    filename="libignition-gazebo-physics-system.so"
+    name="ignition::gazebo::systems::Physics">
+</plugin>
+```
+
+The ```Physics``` plugin is very important for simulating the dynamics of the world.
+
+```bash
+<plugin
+    filename="libignition-gazebo-user-commands-system.so"
+    name="ignition::gazebo::systems::UserCommands">
+</plugin>
+```
+
+The ```UserCommands``` plugin is responsible for creating models, moving models, deleting them and many other user commands.
+
+```bash
+<plugin
+    filename="libignition-gazebo-scene-broadcaster-system.so"
+    name="ignition::gazebo::systems::SceneBroadcaster">
+</plugin>
+```
+
+```SceneBroadcaster``` shows our world scene.
+
+## Viziting Rviz2 ... <a name="Rviz"></a>
+
+### What is it ?
+
+Rviz2 is a **3D visualizer** for **ROS** that lets us view a lot about the **sensing**, **processing** and **state** of a robot.
+This makes the **development** of robots easier and also enables us to **debug** more efficiently (better than looking at numbers on a terminal :P)
+
+### What is the difference between Rviz2 and Gazebo ?
+
+Rviz2 is a **visualizer** i.e it shows what the robot **perceives** is happening while Gazebo is a **simulator** i.e. it shows what is **actually** happening.
+
+Consider the scenario in which we do not have physical hardware-based robots. In that case we would use a simulator like Gazebo to know what would actually happen and the data from the sensors can be visualized in a visualization tool like Rviz2. In case we have physical robots, then the data from the sensors can still be visualized in Rviz, but we do not need a simulator necessarily.
+
+### Installation
+
+Execute the following command
+
+```
+sudo apt-get install ros-humble-rviz2
+```
+
+### Starting Rviz
+
+```
+rviz2
+```
+Upon execution, the following screen should appear.
+
+<img src="W1_Images/rvizscreen.png" width=600 height=400>
+
+Welcome to Rviz2 !
+
+### Basic features
+
+
+1. **Displays** - These are entities that can be "displayed"/ represented/visualized in the world like **point cloud** and **robot state**
+
+<img src="W1_Images/displays.png" width=200 height=400>
+
+Using the **Add** button, we can add additional displays.
+
+<img src="W1_Images/adddisplays.png" width=200 height=400>
+
+
+2. **Camera types** - These are ways of viewing the world from different angles and projections.
+
+<img src="W1_Images/c
+ameratypes.png" width=300 height=90>
+
+3. **Configurations** - These are combinations of displays, camera types, etc that define the overall layout of what and how the visualization is taking place in the rviz window.
+
+### Saving and Loading configurations
+
+Currently the default layout of the Rviz window is similar to the picture below
+
+<img src="W1_Images/deflayout.png" width=800 height=600>
+
+Say we are interested in saving a configuration consisting of additional displays such as LaserScan as well as a different camera type. How do we accomplish that ?
+
+1. Add the required displays and change the camera type
+
+<img src="W1_Images/newlayout.png" width=800 height=600>
+
+2. To save the configuration,
+
+    2.1) Go to **File > Save Config As (Ctrl + Shift + S)**
+  
+    2.2) Go to the appropriate folder (```week1_tutorials > configs```), give an appropriate name (```custom```) and save
+
+3. To load the configuration at a later time,
+
+    3.1) Go to **File > Open Config (Ctrl + O)**
+  
+    3.2) Go to the appropriate folder (```week1_tutorials > configs```) and select the config file (```custom```)
+   
+
+### Starting Rviz2 through Launch files
+
+Create ```custom_rviz.launch.py``` in the ```launch``` folder
+
+Add the following code to launch Rviz with ```custom.rviz``` configuration
+
+```python
+from launch import LaunchDescription
+from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import Node
+import os.path
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='rviz2',
+            namespace='',
+            executable='rviz2',
+            name='rviz2',
+            arguments=['-d', os.path.join(pkg_project, 'config', 'custom.rviz')]
+        )
+    ])
+```
+
+On executing  ```ros2 launch week1_tutorials custom_rviz.launch```, Rviz will be launched with the desired configuration.
+
+## mrs_hudson emerges ... <a name="mrs_hudson"></a>
+
+Meet mrs_hudson, our Sherlock-themed bot for hands-on ROS, Gazebo, and Rviz exploration. You'll find meticulously crafted URDF and launch files, enabling seamless integration for accomplishing investigations and unfolding mysteries
+
+
+## Installing mrs_hudson
+
+For cloning the ```mrs_hudson``` repo you need to have git installed on your system
+
+```bash
+apt-get install git
+```
+
+Then go to the ```erc_ws/src``` directory and open the terminal and run
+
+```bash 
+git clone https://github.com/erciitb/mrs_hudson.git
+```
+
+Now before building the package with ```colcon build``` first we need to change the path of meshes in the urdf and sdf files.
+
+In the ```models``` and ```world``` folder open the urdf and sdf files and in mesh filename update the path of the meshes.
+
+(PS: Use a simple find and replace, eg 
+
+find = ```home/saurabh42/erc_ws/src/mrs_hudson/meshes```
+
+replace = ```home/shiwani418/erc_ws/src/mrs_hudson/meshes```
+
+Do a replace all in both the URDF and SDF file.
+)
+
+Then run ```colcon build``` in the workspace.
+
+Henceforth, the **mrs_hudson** may be referred to as **bot** simply, unless specified.
+
+Let us see the bot in action in Gazebo !
+
+## Launching mrs_hudson in Gazebo
+
+To summon the bot in an **empty world** in **Gazebo**, execute the following command in the erc_ws directory.
+
+```
+ros2 launch mrs_hudson mrs_hudson_empty_world.launch.py
+```
+
+## Visualizing the bot
+
+To visualize it in **Gazebo** & **Rviz**, run the following command in a separate tab
+
+```
+ros2 launch mrs_hudson mrs_hudson_gazebo_rviz.launch.py
+```
+<img src="W1_Images/newlayout.png" width=800 height=600>
+
+## Taking a peek at the nrs_hudson topics
+
+After launching the mrs_hudson in Gazebo, execute ```ros2 topic list``` in another tab.
+
+The expected output is as follows
+```
+/clicked_point
+/clock
+/cmd_vel
+/depth_camera
+/depth_camera/points
+/goal_pose
+/initialpose
+/joint_states
+/lidar
+/lidar/points
+/model/mrs_hudson/odometry
+/parameter_events
+/robot_description
+/rosout
+/tf
+/tf_static
+/world/empty/model/mrs_hudson/joint_state
+saurabh42@saurabh42-HP-Pavilion-Laptop-15-
+```
+
+
+<img src="W1_Images/Sherlock_moving.gif">
+
+## Moving the bot around
+
+Let's move the bot around in the standard world in Gazebo using the ```mrs_hudson_teleop``` script
+
+The Turtlebot3 motion is described by its **linear velocity** and **angular velocity**. The ratio of the instantaneous linear velocity to the instantaneous angular velocity gives the **radius of curvature** of the arc it traverses at the instant.
+
+First launch the bot in gazebo using the launch file then open a new terminal in the erc_ws directory and run the following command
+
+```
+ros2 run mrs_hudson mrs_hudson_teleop.py
+```
+we get the ability to control the linear velocity and the angular velocity of the bot using the appropriate keys as displayed on the screen.
+```bash
+Reading from the keyboard  and Publishing to Twist!
+---------------------------
+Moving around:
+   u    i    o
+   j    k    l
+   m    ,    .
+
+For Holonomic mode (strafing), hold down the shift key:
+---------------------------
+   U    I    O
+   J    K    L
+   M    <    >
+
+t : up (+z)
+b : down (-z)
+
+anything else : stop
+
+q/z : increase/decrease max speeds by 10%
+w/x : increase/decrease only linear speed by 10%
+e/c : increase/decrease only angular speed by 10%
+
+CTRL-C to quit
+```
+
+One might quickly realize that moving the bot with the keys is kind of annoying.
+
+Let's see another way of moving the bot around using a publisher that will publish velocity commands to the ```/cmd_vel``` topic. For simplicity, we shall make it go with a constant speed in a circular path to give the basic idea.
+
+#### Knowing the message type
+
+How do we know the type of message that needs to be published into ```/cmd_vel``` ? Well, on launching the bot in Gazebo, execute the following command in a new tab
+
+``` ros2 topic type /cmd_vel ```
+
+The expected output is ```geometry_msgs/Twist```
+
+To inspect the nature of this message type, execute the following command
+
+``` ros2 topic type /cmd_vel | ros2 msg show ```
+
+The expected output is
+
+```
+geometry_msgs/Vector3 linear
+  float64 x
+  float64 y
+  float64 z
+geometry_msgs/Vector3 angular
+  float64 x
+  float64 y
+  float64 z
+```
+
+
+Once we know the features of the message we are dealing with, we can proceed with the code for moving the bot. 
+
+```bash 
+ros2 run mrs_hudson vel_pub.py
+```
+The bot begins to move in a line. Cool!
+
+
+At this point, the bot must be feeling lonely roaming all by itself. Let us bring a friend to the world. Even a high-functioning sociopath needs one :D 
+
+## Investigation
+
+Take a look at the code in ```mrs_hudson_empty_world.launch.py```, ```mrs_hudson_gazebo_rviz.launch.py``` and ```mrs_hudson_teleop.py```. It will be helpful for the upcoming sections as the commands in these files will be used more or less directly with slight modification to launch the bots.
+
+<img src="W1_Images/Sherlock_moving_2.gif">
+
+## Way ahead
+
+Now that you have gained the ability to write code to move the bot around and sense the surroundings, what you can do with the bot is restricted only by your imagination. 
+
+Try to know more about the mrs_hudson and explore various capabilities like navigation and SLAM by refering to blogs and documentations online.
+
+Additionally, one can try writing code for publishers and subscribers in different ways apart from the prescribed style, such as using **classes**. We shall leave that up to you for exploration. Have fun.
+
+# Let's play a game, shall we ... 
+
+```comming soon ....```
