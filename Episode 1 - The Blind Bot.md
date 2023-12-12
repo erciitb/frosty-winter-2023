@@ -268,20 +268,26 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
 	
 	pkg_project = get_package_share_directory('week1_tutorials')
-	sdf_file = os.path.join(pkg_project, 'models', 'cub_world.sdf')
-	with open(sdf_file, 'r') as infp:
- 		robot_desc = infp.read()
-	
+	pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+
 	gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': '-r sdf_file'}.items(),
+        launch_arguments={'gz_args': os.path.join(pkg_project, 'models', 'cub_world.sdf')}.items(),
     	)
+	
+	bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/world/empty/model/cub_world/joint_state@sensor_msgs/msg/JointState@ignition.msgs.Model',
+    				'/clock@rosgraph_msgs/Clock@ignition.msgs.Clock'],
+        output='screen'
+    )
 
 	return LaunchDescription([
 		gz_sim,
+		bridge
 		])
-
 ```
 
 Now execute ```ros2 launch week1_tutorials cub.launch.py``` to launch world and spawn the model into it.
