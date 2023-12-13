@@ -18,6 +18,11 @@ The workshop is packed with challenging activities solved using very useful tool
 ### Week 0 
 Learn basic tools and units of ROS, how these interact with each other and how to make one of your own. In the assignment for this week you will have made your own ROS setup comprising of 3 components talking to each other and working on the data provided by others. This is the basis of ROS, where different units (sensors, algorithms, simulators etc. called nodes) interact with each other (on topics called ROS topics) and each of those perform a function.
 
+### Week 1
+This week is the one with introduction to most of the new stuff. You get to simulate your bots in virtual reality!! Basics of Gazebo (a simulation software) and how it interfaces with ROS are taught here. But wait, which bot do you simulate? Our own custom mrs_hudson. We are going to write code that allows us to control it; or perhaps a few of them together with a just a few clicks. Not just this, you can also see and feel what these bots can using RViz (a visualization software). This is where your virtual reality links with algorithms that can be applied to bots in the real world as well.
+
+<img src="W1_Images/mrs_hudson.jpeg"  width=200 height=300>
+
 .... to be continued
 
 Head on to [Episode 0](https://github.com/erciitb/frosty-winter-2023/blob/main/Episode%200%20-%20A%20Study%20in%20ROS2.md) and start the investigation! 

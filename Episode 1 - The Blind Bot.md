@@ -290,7 +290,20 @@ def generate_launch_description():
 		])
 ```
 
-Now execute ```ros2 launch week1_tutorials cub.launch.py``` to launch world and spawn the model into it.
+Now add the following line in ```setup.py``` in the ```data_files```
+
+```python
+(os.path.join('share', package_name, 'models'), glob(os.path.join('models', 'cub_world.sdf'))),
+```
+
+and add the follwing on the top of ```setup.py```
+
+```python 
+import os
+from glob import glob
+```
+
+Now execute ```ros2 launch week1_tutorials cub.launch.py``` after ```colcon build``` form workspace to launch world and spawn the model into it.
   
 ### Plugins
   
@@ -423,7 +436,13 @@ def generate_launch_description():
     ])
 ```
 
-On executing  ```ros2 launch week1_tutorials custom_rviz.launch```, Rviz will be launched with the desired configuration.
+Now add the following line in ```setup.py``` in the ```data_files```
+
+```python
+(os.path.join('share', package_name, 'config'), glob(os.path.join('config', 'custom.rviz'))),
+```
+
+On executing  ```ros2 launch week1_tutorials custom_rviz.launch``` after `colcon build` from workspace, Rviz will be launched with the desired configuration.
 
 ## ros_gz 
 
