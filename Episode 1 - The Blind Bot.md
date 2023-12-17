@@ -632,6 +632,246 @@ Take a look at the code in ```mrs_hudson_empty_world.launch.py```, ```mrs_hudson
 
 <img src="W1_Images/Sherlock_moving_2.gif">
 
+
+mrs_hudson_empty_world.launch.py:
+
+```python
+from launch import LaunchDescription
+from launch_ros.actions import Node
+import os
+from launch.actions import DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from ament_index_python.packages import get_package_share_directory
+
+def generate_launch_description():
+	
+	pkg_project = get_package_share_directory('mrs_hudson')
+	pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+
+	gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
+        launch_arguments={'gz_args': os.path.join(pkg_project, 'worlds', 'mrs_hudson.sdf')}.items(),
+    	)
+	
+	bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
+                   '/model/mrs_hudson/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry',
+                   '/world/empty/model/mrs_hudson/joint_state@sensor_msgs/msg/JointState@ignition.msgs.Model',
+                   'lidar@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
+                   ],
+        output='screen'
+    )
+
+	return LaunchDescription([
+		gz_sim,
+		bridge
+		])
+```
+
+mrs_hudson_gazebo_rviz.launch.py`
+```python
+from launch import LaunchDescription
+from launch_ros.actions import Node
+import os
+from launch.actions import DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from ament_index_python.packages import get_package_share_directory
+
+def generate_launch_description():
+	
+	pkg_project = get_package_share_directory('mrs_hudson')
+	pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+	sdf_file = os.path.join(pkg_project, 'models', 'mrs_hudson.urdf')
+	with open(sdf_file, 'r') as infp:
+ 		robot_desc = infp.read()
+ 	
+	robot_state_publisher = Node(
+  	 package='robot_state_publisher',
+   	 executable='robot_state_publisher',
+   	 name='robot_state_publisher',
+   	 output='both',
+   	 parameters=[
+   	     {'use_sim_time': True},
+   	     {'robot_description': robot_desc},
+   	 ]
+	)
+	
+	gz_sim = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_project, 'launch', 'mrs_hudson_empty_world.launch.py'))
+    	)
+	rviz = Node(
+	package='rviz2',
+	executable='rviz2',
+	arguments=['-d', os.path.join(pkg_project, 'config', 'mrs_hudson.rviz')],
+	)
+
+	return LaunchDescription([
+		robot_state_publisher,
+		rviz,
+		gz_sim
+		])
+```
+
+mrs_hudson_teleop.py
+
+```python
+import rclpy
+from geometry_msgs.msg import Twist
+import sys, select, termios, tty
+
+settings = termios.tcgetattr(sys.stdin)
+
+msg = """
+Reading from the keyboard  and Publishing to Twist!
+---------------------------
+Moving around:
+   u    i    o
+   j    k    l
+   m    ,    .
+
+For Holonomic mode (strafing), hold down the shift key:
+---------------------------
+   U    I    O
+   J    K    L
+   M    <    >
+
+t : up (+z)
+b : down (-z)
+
+anything else : stop
+
+q/z : increase/decrease max speeds by 10%
+w/x : increase/decrease only linear speed by 10%
+e/c : increase/decrease only angular speed by 10%
+
+CTRL-C to quit
+"""
+
+moveBindings = {
+        'i':(1,0,0,0),
+        'o':(1,0,0,-1),
+        'j':(0,0,0,1),
+        'l':(0,0,0,-1),
+        'u':(1,0,0,1),
+        ',':(-1,0,0,0),
+        '.':(-1,0,0,1),
+        'm':(-1,0,0,-1),
+        'O':(1,-1,0,0),
+        'I':(1,0,0,0),
+        'J':(0,1,0,0),
+        'L':(0,-1,0,0),
+        'U':(1,1,0,0),
+        '<':(-1,0,0,0),
+        '>':(-1,-1,0,0),
+        'M':(-1,1,0,0),
+        't':(0,0,1,0),
+        'b':(0,0,-1,0),
+           }
+
+speedBindings={
+        'q':(1.1,1.1),
+        'z':(.9,.9),
+        'w':(1.1,1),
+        'x':(.9,1),
+        'e':(1,1.1),
+        'c':(1,.9),
+          }
+
+def getKey():
+    tty.setraw(sys.stdin.fileno())
+    select.select([sys.stdin], [], [], 0)
+    key = sys.stdin.read(1)
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+
+def vels(speed,turn):
+    return "currently:\tspeed %s\tturn %s " % (speed,turn)
+
+def main(args=None):    
+    if args is None:
+        args = sys.argv
+
+    rclpy.init(args=args)
+    node = rclpy.create_node('teleop_twist_keyboard')
+        
+    pub = node.create_publisher(Twist, 'cmd_vel', 10)
+
+    speed = 0.5
+    turn = 1.0
+    x = 0
+    y = 0
+    z = 0
+    th = 0
+    status = 0
+
+    try:
+        print(msg)
+        print(vels(speed,turn))
+        while(1):
+            key = getKey()
+            if key in moveBindings.keys():
+                x = moveBindings[key][0]
+                y = moveBindings[key][1]
+                z = moveBindings[key][2]
+                th = moveBindings[key][3]
+            elif key in speedBindings.keys():
+                speed = speed * speedBindings[key][0]
+                turn = turn * speedBindings[key][1]
+
+                print(vels(speed,turn))
+                if (status == 14):
+                    print(msg)
+                status = (status + 1) % 15
+            else:
+                x = 0
+                y = 0
+                z = 0
+                th = 0
+                if (key == '\x03'):
+                    break
+
+            twist = Twist()
+            twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
+            twist.angular.x = 0.0; twist.angular.y = 0.0; twist.angular.z = th*turn
+            pub.publish(twist)
+
+    except:
+        print(e)
+
+    finally:
+        twist = Twist()
+        twist.linear.x = 0.0; twist.linear.y = 0.0; twist.linear.z = 0.0
+        twist.angular.x = 0.0; twist.angular.y = 0.0; twist.angular.z = 0.0
+        pub.publish(twist)
+
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+```
+
+
+## Lidar & mrs_hudson
+
+Git clone the latest mrs_hudson package and then explore about lidar of the bot. 
+
+Launch mrs_hudson using the ```mrs_hudson_gazebo_rviz.launch.py``` and observe the lidar data in rviz by moving the bot using the ```teleop``` script and adding some obstacles like cubes in the sdf file. :) just see how we spawn the cuboid in the empty world.
+
+For observing the lidar in gazebo you can search lidar in gazebo and the click on it to observe the lidar. And for echoing lidar messages use:
+```bash
+ign topic -e -t /lidar
+```
+
+PS: See the ```mrs_hudson_arena.sdf``` provided for the assignment for better understanding of the lidar.
+
 ## Way ahead
 
 Now that you have gained the ability to write code to move the bot around and sense the surroundings, what you can do with the bot is restricted only by your imagination. 
@@ -642,4 +882,44 @@ Additionally, one can try writing code for publishers and subscribers in differe
 
 # Let's play a game, shall we ... 
 
-```comming soon ....```
+mrs_hudson is trapped in a room and there doesn't seem to be a way out unless the code to escape the room is figured out. She needs to **explore the room autonomously** and find clues which will help them determine the code. As they explore, they should make sure to **avoid colliding with objects** around them.
+
+## Steps
+1. Create a package ```task_1``` with ```launch```, ```config```, ```meshes``` and ```worlds```  folders.
+2. Download the ```mrs_hudson_arena.world``` fand ```mrs_hudson_world.launch.py``` from the link below and add them to the ```worlds``` and ```launch``` folder respectively. Also think where to save the rviz configuration file.
+
+    [Task 1_files](https://github.com/erciitb/frosty-winter-2023/tree/main/Task%201_files)
+
+3. Create a node file ```96.py``` in the ```task1``` folder of ```task_1``` package, which will be responsible for **obstacle avoidance and exploration** of the room.
+4. Then setup the package by adding the required in setup.py and package.xml. :) hope you guys understood and not just copied pasted till now. You need to add the meshes in task1 package, just copy formo mrs_hudson package. Also you need to change the directory of the meshes according to where you make the package in sdf file, as we did for setting up mrs_hudson package.
+4. Launch he bot and your script and let the bot find its way.
+5. The bot will begin exploring the room while avoiding obstacles.
+
+Have fun!
+
+PS: Hint use lidar data, write the python script to get the data and using it to find the path, it need not to be the most efficient for now.
+
+<img src="W1_Images/Code.gif">
+
+## Submission details
+
+### Tentative deadline
+23 December 2022, 11:59 PM
+
+### Mode of Submission
+
+The submission link is attached below.  Add ```96.py``` to a Google Drive folder and submit the link to the folder through the form. Also add the screen recording of the bot moving through the obstacle.
+
+[Submission Link](https://forms.gle/xmkVyjG1QBQBTh3k7)
+
+
+Also, make sure to change the settings as follows-
+
+**Share > Get link > Anyone with the link**
+
+
+### Points to be noted 
+
+1. Submitting a simple algorithm that does the basic task of avoidance and exploration is good enough for this task. You will realize over time that a simple implementation might not be perfect in avoiding all kinds of obstacles since the obstacles can be in all shapes and orientations. You can experiment, test in different environments and improve the algorithm over time if the problem of obstacle avoidance and exploration continues to interest you.
+
+2. If you are in a team, it is advised that you work with your team member for greater efficiency.
