@@ -904,7 +904,7 @@ PS: Hint use lidar data, write the python script to get the data and using it to
 ## Submission details
 
 ### Tentative deadline
-23 December 2022, 11:59 PM
+19 December 2022, 11:59 PM
 
 ### Mode of Submission
 
