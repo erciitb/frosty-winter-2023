@@ -884,6 +884,9 @@ Additionally, one can try writing code for publishers and subscribers in differe
 
 mrs_hudson is trapped in a room and there doesn't seem to be a way out unless the code to escape the room is figured out. She needs to **explore the room autonomously** and find clues which will help them determine the code. As they explore, they should make sure to **avoid colliding with objects** around them.
 
+<img src="W1_Images/task1.png">
+<img src="W1_Images/task1_lidar.png">
+
 ## Steps
 1. Create a package ```task_1``` with ```launch```, ```config```, ```meshes``` and ```worlds```  folders.
 2. Download the ```mrs_hudson_arena.world``` fand ```mrs_hudson_world.launch.py``` from the link below and add them to the ```worlds``` and ```launch``` folder respectively. Also think where to save the rviz configuration file.
