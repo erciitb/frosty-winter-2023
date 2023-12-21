@@ -294,6 +294,7 @@ Now add the following line in ```setup.py``` in the ```data_files```
 
 ```python
 (os.path.join('share', package_name, 'models'), glob(os.path.join('models', 'cub_world.sdf'))),
+(os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', 'cub.launch.py'))),
 ```
 
 and add the follwing on the top of ```setup.py```
