@@ -597,13 +597,13 @@ Let's see another way of moving the bot around using a publisher that will publi
 
 How do we know the type of message that needs to be published into ```/cmd_vel``` ? Well, on launching the bot in Gazebo, execute the following command in a new tab
 
-``` ros2 topic type /cmd_vel ```
+``` ros2 topic info /cmd_vel ```
 
 The expected output is ```geometry_msgs/Twist```
 
 To inspect the nature of this message type, execute the following command
 
-``` ros2 topic type /cmd_vel | ros2 msg show ```
+``` ros2 interface show geometry_msgs/msg/Twist ```
 
 The expected output is
 
