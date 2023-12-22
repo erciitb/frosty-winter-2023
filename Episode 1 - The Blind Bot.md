@@ -426,6 +426,7 @@ from launch_ros.actions import Node
 import os.path
 
 def generate_launch_description():
+    pkg_project = get_package_share_directory('week1_tutorials')
     return LaunchDescription([
         Node(
             package='rviz2',
