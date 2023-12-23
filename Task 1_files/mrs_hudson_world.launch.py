@@ -12,6 +12,9 @@ def generate_launch_description():
 	
 	pkg_project = get_package_share_directory('task1')
 	pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+	sdf_file = os.path.join(pkg_project, 'models', 'mrs_hudson.urdf')
+	with open(sdf_file, 'r') as infp:
+ 		robot_desc = infp.read()	
  		
 	robot_state_publisher = Node(
   	 package='robot_state_publisher',
