@@ -31,7 +31,7 @@ Time to put your sherlock brains to the test. I am sure all of you have used QR 
 ### Week 3
 The final week has come, for you to show all that you have mastered. Not just this, you also learn to write high quality code files to make your creations more of a universal standard. The assignment for this week is where you make a bot autonomous so that it can solve a much more complex maze. The story ends here and Sherlock awaits his next adventure.
 
-<img src="Task 2_files/final_maze.jpg" width=600 height=400>
+<img src="W3_Files/final_maze.jpg" width=600 height=400>
 
 .... to be continued
 
